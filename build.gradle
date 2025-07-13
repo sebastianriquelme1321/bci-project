@@ -43,21 +43,30 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
 
 
-    // Spring Boot test support (excluding JUnit 4)
-    testImplementation('org.springframework.boot:spring-boot-starter-test')
-
+    // Spring Boot test support with JUnit 5
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    
+    // JUnit 5 dependencies
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+sourceSets {
+    test {
+        java {
+            srcDirs = ['src/test/java']
+        }
+    }
 }
 
 test {
     useJUnitPlatform()
-
-    sourceSets {
-        test {
-            groovy {
-                srcDirs = ['src/test/groovy']
-            }
-        }
+    
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
     }
 
     finalizedBy jacocoTestReport
@@ -65,18 +74,27 @@ test {
 
 jacocoTestReport {
     dependsOn test
+    
     reports {
         xml.required = true
         html.required = true
+        csv.required = false
     }
 
     afterEvaluate {
         classDirectories.setFrom(
                 files(classDirectories.files.collect {
                     fileTree(dir: it, exclude: [
-                            '**/com/exercice/cdi/exception/**, **/com/exercice/cdi/controller/dto/**, **/com/exercice/cdi/repository/entity/**'
+                            '**/cl/bci/ejercicio/exception/**',
+                            '**/cl/bci/ejercicio/dto/**',
+                            '**/cl/bci/ejercicio/entity/**',
+                            '**/cl/bci/ejercicio/BciProjectApplication.class'
                     ])
                 })
         )
     }
+}
+
+jacoco {
+    toolVersion = "0.8.7"
 }
