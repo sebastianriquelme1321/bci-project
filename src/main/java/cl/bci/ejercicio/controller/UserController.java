@@ -1,6 +1,5 @@
 package cl.bci.ejercicio.controller;
 
-import cl.bci.ejercicio.dto.LoginRequestDto;
 import cl.bci.ejercicio.dto.SignUpRequestDto;
 import cl.bci.ejercicio.dto.SignUpResponseDto;
 import cl.bci.ejercicio.dto.UserResponseDto;
