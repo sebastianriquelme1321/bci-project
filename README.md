@@ -75,6 +75,12 @@ token: <jwt-token>
 - **API Docs JSON:** http://localhost:8080/v2/api-docs
 - **Documentación completa:** `SWAGGER_DOCUMENTATION.md`
 
+### Diagramas UML
+- **📁 Carpeta de diagramas:** `diagramas/`
+- **🏗️ Diagrama de Componentes:** `diagramas/diagrama-componentes.md`
+- **🔄 Diagrama de Secuencia:** `diagramas/diagrama-secuencia.md`
+- **📖 Documentación de diagramas:** `diagramas/README.md`
+
 ### JavaDoc
 Todas las clases incluyen documentación JavaDoc completa con descripción, parámetros y ejemplos.
 
