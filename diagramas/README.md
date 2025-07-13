@@ -16,14 +16,6 @@ Esta carpeta contiene los diagramas UML del proyecto BCI Project API REST, cumpl
 - **Estándar**: UML 2.0 - Sequence Diagram
 - **Tecnología**: Mermaid Diagram
 
-## 🎯 Propósito
-
-Estos diagramas proporcionan:
-
-- **Visión arquitectónica**: Estructura general del sistema
-- **Flujo de procesos**: Secuencia de operaciones para casos de uso principales
-- **Documentación técnica**: Referencia para desarrolladores
-- **Cumplimiento de estándares**: Diagramas UML según especificaciones
 
 ## 📋 Especificaciones UML
 
@@ -56,21 +48,7 @@ Los diagramas se renderizan automáticamente en plataformas que soporten Mermaid
 - [Mermaid Live Editor](https://mermaid.live/)
 - [GitHub Mermaid](https://github.blog/2022-02-14-include-diagrams-markdown-files-mermaid/)
 
-## 🏗️ Arquitectura Documentada
 
-### Capas del Sistema
-1. **Presentación**: Controllers, Exception Handlers, Configuration
-2. **Servicios**: Business Logic, JWT Management
-3. **Persistencia**: Repositories, Database Access
-4. **Entidades**: JPA Entities, Domain Models
-5. **Utilidades**: Mappers, Encryption, Helper Classes
-
-### Patrones Implementados
-- **Layered Architecture**: Separación en capas
-- **DTO Pattern**: Transferencia de datos
-- **Repository Pattern**: Acceso a datos
-- **Service Layer**: Lógica de negocio
-- **Exception Handling**: Manejo centralizado de errores
 
 ## 📚 Referencias
 
@@ -80,6 +58,6 @@ Los diagramas se renderizan automáticamente en plataformas que soporten Mermaid
 
 ---
 
-**Autor**: BCI Team  
-**Fecha**: Diciembre 2024  
+**Autor**: Sebastian Riquelme  
+**Fecha**: Julio 2025  
 **Versión**: 1.0.0 
