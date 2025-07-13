@@ -1,10 +1,13 @@
 package cl.bci.ejercicio.service;
 
-import cl.bci.ejercicio.dto.*;
+import cl.bci.ejercicio.dto.LoginRequest;
+import cl.bci.ejercicio.dto.PhoneDto;
+import cl.bci.ejercicio.dto.SignUpRequest;
+import cl.bci.ejercicio.dto.UserResponse;
 import cl.bci.ejercicio.entity.Phone;
 import cl.bci.ejercicio.entity.User;
 import cl.bci.ejercicio.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,18 +16,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class UserService {
 
-    private final UserRepository userRepository;
-    private final JwtService jwtService;
-    private final ValidationService validationService;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private JwtService jwtService;
+
 
     @Transactional
     public UserResponse signUp(SignUpRequest request) {
-        // Validar formato de email y contraseña
-        validationService.validateEmail(request.getEmail());
-        validationService.validatePassword(request.getPassword());
 
         // Verificar si el usuario ya existe
         if (userRepository.existsByEmail(request.getEmail())) {
