@@ -9,6 +9,7 @@ import cl.bci.ejercicio.entity.User;
 import cl.bci.ejercicio.exception.UserAlReadyExist;
 import cl.bci.ejercicio.exception.UserNotFoundException;
 import cl.bci.ejercicio.repository.UserRepository;
+import cl.bci.ejercicio.utils.AESUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,7 +48,7 @@ class UserServiceTest {
     private final String TEST_TOKEN = "test-jwt-token";
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         // Arrange - Configuración común para todos los tests
         phoneDto = PhoneDto.builder()
                 .number(123456789L)
@@ -70,7 +71,7 @@ class UserServiceTest {
                 .id(UUID.randomUUID())
                 .name("Test User")
                 .email(TEST_EMAIL)
-                .password("TestPass1234")
+                .password(AESUtil.encrypt("TestPass1234"))
                 .phones(Arrays.asList(phone))
                 .created(LocalDateTime.now())
                 .lastLogin(LocalDateTime.now())
@@ -82,7 +83,7 @@ class UserServiceTest {
     }
 
     @Test
-    void signUp_WhenUserDoesNotExist_ShouldCreateUserSuccessfully() {
+    void signUp_WhenUserDoesNotExist_ShouldCreateUserSuccessfully() throws Exception {
         // Arrange
         when(userRepository.existsByEmail(TEST_EMAIL)).thenReturn(false);
         when(jwtService.generateToken(TEST_EMAIL)).thenReturn(TEST_TOKEN);
@@ -121,7 +122,7 @@ class UserServiceTest {
     }
 
     @Test
-    void signUp_WhenPhonesAreNull_ShouldCreateUserWithoutPhones() {
+    void signUp_WhenPhonesAreNull_ShouldCreateUserWithoutPhones() throws Exception {
         // Arrange
         signUpRequestDto.setPhones(null);
         User userWithoutPhones = User.builder()
@@ -154,7 +155,7 @@ class UserServiceTest {
     }
 
     @Test
-    void login_WhenUserExists_ShouldReturnUserResponseDto() {
+    void login_WhenUserExists_ShouldReturnUserResponseDto() throws Exception {
         // Arrange
         when(jwtService.extractEmail(TEST_TOKEN)).thenReturn(TEST_EMAIL);
         when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(mockUser));
@@ -168,7 +169,7 @@ class UserServiceTest {
         assertEquals(mockUser.getId(), result.getId());
         assertEquals(mockUser.getName(), result.getName());
         assertEquals(mockUser.getEmail(), result.getEmail());
-        assertEquals(mockUser.getPassword(), result.getPassword());
+        assertEquals("TestPass1234", result.getPassword());
         assertEquals(mockUser.getIsActive(), result.getIsActive());
         assertEquals(TEST_TOKEN, result.getToken());
         assertNotNull(result.getPhones());

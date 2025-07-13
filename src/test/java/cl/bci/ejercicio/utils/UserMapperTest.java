@@ -24,7 +24,7 @@ class UserMapperTest {
     private LocalDateTime testDateTime;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         // Arrange - Configuración común
         testDateTime = LocalDateTime.now();
         
@@ -42,7 +42,7 @@ class UserMapperTest {
                 .id(UUID.randomUUID())
                 .name("Test User")
                 .email("test@example.com")
-                .password("testPassword")
+                .password(AESUtil.encrypt("testPassword"))
                 .phones(Arrays.asList(phone1, phone2))
                 .created(testDateTime)
                 .lastLogin(testDateTime)
@@ -52,7 +52,7 @@ class UserMapperTest {
     }
 
     @Test
-    void convertToUserResponse_WhenUserHasPhones_ShouldReturnCompleteUserResponseDto() {
+    void convertToUserResponse_WhenUserHasPhones_ShouldReturnCompleteUserResponseDto() throws Exception {
         // Arrange
         // (user ya está configurado en setUp)
 
@@ -64,7 +64,7 @@ class UserMapperTest {
         assertEquals(user.getId(), result.getId());
         assertEquals(user.getName(), result.getName());
         assertEquals(user.getEmail(), result.getEmail());
-        assertEquals(user.getPassword(), result.getPassword());
+        assertEquals("testPassword", result.getPassword());
         assertEquals(user.getCreated(), result.getCreated());
         assertEquals(user.getLastLogin(), result.getLastLogin());
         assertEquals(user.getToken(), result.getToken());
@@ -86,7 +86,7 @@ class UserMapperTest {
     }
 
     @Test
-    void convertToUserResponse_WhenUserHasNoPhones_ShouldReturnEmptyPhonesList() {
+    void convertToUserResponse_WhenUserHasNoPhones_ShouldReturnEmptyPhonesList() throws Exception {
         // Arrange
         user.setPhones(new ArrayList<>());
 
@@ -98,7 +98,7 @@ class UserMapperTest {
         assertEquals(user.getId(), result.getId());
         assertEquals(user.getName(), result.getName());
         assertEquals(user.getEmail(), result.getEmail());
-        assertEquals(user.getPassword(), result.getPassword());
+        assertEquals("testPassword", result.getPassword());
         assertEquals(user.getCreated(), result.getCreated());
         assertEquals(user.getLastLogin(), result.getLastLogin());
         assertEquals(user.getToken(), result.getToken());
@@ -110,13 +110,21 @@ class UserMapperTest {
     }
 
     @Test
-    void convertToUserResponse_WhenUserHasNullPhones_ShouldHandleGracefully() {
+    void convertToUserResponse_WhenUserHasNullPhones_ShouldHandleGracefully() throws Exception {
         // Arrange
         user.setPhones(null);
 
         // Act & Assert
         assertThrows(NullPointerException.class, () -> {
-            UserMapper.convertToUserResponse(user);
+            try {
+                UserMapper.convertToUserResponse(user);
+            } catch (Exception e) {
+                if (e instanceof NullPointerException) {
+                    throw (NullPointerException) e;
+                } else {
+                    throw new RuntimeException(e);
+                }
+            }
         });
     }
 
@@ -178,7 +186,7 @@ class UserMapperTest {
     }
 
     @Test
-    void convertToUserResponse_WhenPhoneHasNullValues_ShouldHandleGracefully() {
+    void convertToUserResponse_WhenPhoneHasNullValues_ShouldHandleGracefully() throws Exception {
         // Arrange
         Phone phoneWithNulls = new Phone();
         phoneWithNulls.setNumber(null);

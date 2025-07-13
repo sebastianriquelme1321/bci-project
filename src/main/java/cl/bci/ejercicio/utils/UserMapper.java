@@ -12,7 +12,7 @@ public class UserMapper {
 
 
 
-    public static UserResponseDto convertToUserResponse(User user) {
+    public static UserResponseDto convertToUserResponse(User user) throws Exception {
         List<PhoneDto> phoneDtos = user.getPhones().stream()
                 .map(phone -> PhoneDto.builder()
                         .number(phone.getNumber())
@@ -29,7 +29,7 @@ public class UserMapper {
                 .created(user.getCreated())
                 .lastLogin(user.getLastLogin())
                 .token(user.getToken())
-                .password(user.getPassword())
+                .password(AESUtil.decrypt(user.getPassword()))
                 .isActive(user.getIsActive())
                 .build();
     }

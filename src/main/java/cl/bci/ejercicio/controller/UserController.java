@@ -57,7 +57,7 @@ public class UserController {
     @PostMapping("/sign-up")
     public ResponseEntity<SignUpResponseDto> signUp(
             @ApiParam(value = "Datos del usuario a registrar", required = true)
-            @Valid @RequestBody SignUpRequestDto request) {
+            @Valid @RequestBody SignUpRequestDto request) throws Exception {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(userService.signUp(request));
     }
@@ -86,7 +86,7 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<UserResponseDto> login(
             @ApiParam(value = "Token JWT del usuario", required = true, example = "eyJhbGciOiJIUzUxMiJ9...")
-            @Valid @RequestHeader String token) {
+            @Valid @RequestHeader String token) throws Exception {
         UserResponseDto response = userService.login(token);
         return ResponseEntity.ok(response);
     }
