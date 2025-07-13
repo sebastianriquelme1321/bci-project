@@ -18,6 +18,17 @@ import java.util.stream.Collectors;
 import static cl.bci.ejercicio.utils.UserMapper.convertToSignUpResponse;
 import static cl.bci.ejercicio.utils.UserMapper.convertToUserResponse;
 
+/**
+ * Servicio para la gestión de usuarios del sistema.
+ * 
+ * Esta clase contiene la lógica de negocio para las operaciones
+ * relacionadas con usuarios, incluyendo registro, autenticación
+ * y validaciones de negocio.
+ * 
+ * @author BCI Team
+ * @version 1.0
+ * @since 1.0
+ */
 @Service
 public class UserService {
 
@@ -27,6 +38,20 @@ public class UserService {
     private JwtService jwtService;
 
 
+    /**
+     * Registra un nuevo usuario en el sistema.
+     * 
+     * Este método realiza las siguientes operaciones:
+     * 1. Valida que el email no esté previamente registrado
+     * 2. Crea el usuario con los datos proporcionados
+     * 3. Mapea los teléfonos si están presentes
+     * 4. Genera un token JWT para el usuario
+     * 5. Persiste el usuario en la base de datos
+     * 
+     * @param request DTO con los datos del usuario a registrar
+     * @return SignUpResponseDto con la información básica del usuario creado y su token
+     * @throws UserAlReadyExist si ya existe un usuario con el mismo email
+     */
     @Transactional
     public SignUpResponseDto signUp(SignUpRequestDto request) {
 
@@ -54,6 +79,19 @@ public class UserService {
         return convertToSignUpResponse(savedUser);
     }
 
+    /**
+     * Autentica un usuario mediante token JWT.
+     * 
+     * Este método realiza las siguientes operaciones:
+     * 1. Extrae el email del token JWT proporcionado
+     * 2. Busca el usuario en la base de datos por email
+     * 3. Actualiza la fecha de último login
+     * 4. Retorna la información completa del usuario
+     * 
+     * @param token Token JWT válido del usuario
+     * @return UserResponseDto con toda la información del usuario autenticado
+     * @throws UserNotFoundException si no se encuentra un usuario con el email del token
+     */
     @Transactional
     public UserResponseDto login(String token) {
         String email = jwtService.extractEmail(token);
