@@ -1,7 +1,5 @@
 package cl.bci.ejercicio.exception;
 
-import cl.bci.ejercicio.dto.ErrorResponse;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -9,67 +7,67 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.validation.ConstraintViolationException;
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
-@Slf4j
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
-        log.error("IllegalArgumentException: {}", ex.getMessage(), ex);
-        
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(LocalDateTime.now())
+    @ExceptionHandler(UserAlReadyExist.class)
+    public ResponseEntity<ApiErrorResponseDto> handleUserAlReadyExist(UserAlReadyExist ex) {
+
+        ApiErrorResponseDto errorResponseDto = ApiErrorResponseDto.builder()
+                .timestamp(Timestamp.from(Instant.now()))
                 .detail(ex.getMessage())
+                .codigo(HttpStatus.BAD_REQUEST.value())
                 .build();
         
-        return ResponseEntity.badRequest().body(errorResponse);
+        return ResponseEntity.badRequest().body(errorResponseDto);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        log.error("Validation error: {}", ex.getMessage(), ex);
-        
+    public ResponseEntity<ApiErrorResponseDto> handleValidationExceptions(MethodArgumentNotValidException ex) {
+
         String errorMessage = ex.getBindingResult().getFieldErrors().stream()
                 .map(error -> error.getDefaultMessage())
                 .collect(Collectors.joining(", "));
 
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(LocalDateTime.now())
+        ApiErrorResponseDto errorResponseDto = ApiErrorResponseDto.builder()
+                .timestamp(Timestamp.from(Instant.now()))
                 .detail(errorMessage)
+                .codigo(HttpStatus.BAD_REQUEST.value())
                 .build();
-        
-        return ResponseEntity.badRequest().body(errorResponse);
+
+        return ResponseEntity.badRequest().body(errorResponseDto);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException ex) {
-        log.error("Constraint violation: {}", ex.getMessage(), ex);
-        
+    public ResponseEntity<ApiErrorResponseDto> handleConstraintViolationException(ConstraintViolationException ex) {
+
         String errorMessage = ex.getConstraintViolations().stream()
                 .map(violation -> violation.getMessage())
                 .collect(Collectors.joining(", "));
 
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(LocalDateTime.now())
+        ApiErrorResponseDto errorResponseDto = ApiErrorResponseDto.builder()
+                .timestamp(Timestamp.from(Instant.now()))
                 .detail(errorMessage)
+                .codigo(HttpStatus.BAD_REQUEST.value())
                 .build();
-        
-        return ResponseEntity.badRequest().body(errorResponse);
+
+        return ResponseEntity.badRequest().body(errorResponseDto);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
-        log.error("Generic exception: {}", ex.getMessage(), ex);
-        
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(LocalDateTime.now())
+    public ResponseEntity<ApiErrorResponseDto> handleGenericException(Exception ex) {
+
+
+
+        ApiErrorResponseDto errorResponseDto = ApiErrorResponseDto.builder()
+                .timestamp(Timestamp.from(Instant.now()))
+                .detail("Ocurrió un error inesperado. Por favor contacte al soporte.")
                 .codigo(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .detail("Error interno del servidor")
                 .build();
-        
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponseDto);
     }
 } 

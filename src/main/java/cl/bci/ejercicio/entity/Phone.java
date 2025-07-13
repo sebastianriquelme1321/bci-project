@@ -22,10 +22,10 @@ public class Phone {
     @Column(name = "number", nullable = false)
     private Long number;
 
-    @Column(name = "citycode", nullable = false)
-    private Integer citycode;
+    @Column(name = "cityCode", nullable = false)
+    private Integer cityCode;
 
-    @Column(name = "contrycode", nullable = false)
+    @Column(name = "contryCode", nullable = false)
     private String contrycode;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -1,8 +1,9 @@
 package cl.bci.ejercicio.controller;
 
-import cl.bci.ejercicio.dto.LoginRequest;
-import cl.bci.ejercicio.dto.SignUpRequest;
-import cl.bci.ejercicio.dto.UserResponse;
+import cl.bci.ejercicio.dto.LoginRequestDto;
+import cl.bci.ejercicio.dto.SignUpRequestDto;
+import cl.bci.ejercicio.dto.SignUpResponseDto;
+import cl.bci.ejercicio.dto.UserResponseDto;
 import cl.bci.ejercicio.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,14 +23,14 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/sign-up")
-    public ResponseEntity<UserResponse> signUp(@Valid @RequestBody SignUpRequest request) {
-        UserResponse response = userService.signUp(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    public ResponseEntity<SignUpResponseDto> signUp(@Valid @RequestBody SignUpRequestDto request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(userService.signUp(request));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserResponse> login(@Valid @RequestBody LoginRequest request) {
-        UserResponse response = userService.login(request);
+    public ResponseEntity<UserResponseDto> login(@Valid @RequestBody LoginRequestDto request) {
+        UserResponseDto response = userService.login(request);
         return ResponseEntity.ok(response);
     }
 } 

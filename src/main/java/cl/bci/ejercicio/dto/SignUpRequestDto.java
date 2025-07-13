@@ -9,7 +9,7 @@ import javax.validation.constraints.Pattern;
 import java.util.List;
 
 @Data
-public class SignUpRequest {
+public class SignUpRequestDto {
 
     @NotBlank(message = "El nombre es obligatorio")
     private String name;

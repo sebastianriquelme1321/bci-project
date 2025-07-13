@@ -1,12 +1,12 @@
 package cl.bci.ejercicio.service;
 
-import cl.bci.ejercicio.dto.LoginRequest;
-import cl.bci.ejercicio.dto.PhoneDto;
-import cl.bci.ejercicio.dto.SignUpRequest;
-import cl.bci.ejercicio.dto.UserResponse;
+import cl.bci.ejercicio.dto.*;
 import cl.bci.ejercicio.entity.Phone;
 import cl.bci.ejercicio.entity.User;
+import cl.bci.ejercicio.exception.UserAlReadyExist;
+import cl.bci.ejercicio.exception.UserNotFoundException;
 import cl.bci.ejercicio.repository.UserRepository;
+import cl.bci.ejercicio.utils.PhoneMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static cl.bci.ejercicio.utils.UserMapper.convertToSignUpResponse;
+import static cl.bci.ejercicio.utils.UserMapper.convertToUserResponse;
 
 @Service
 public class UserService {
@@ -25,14 +28,12 @@ public class UserService {
 
 
     @Transactional
-    public UserResponse signUp(SignUpRequest request) {
+    public SignUpResponseDto signUp(SignUpRequestDto request) {
 
-        // Verificar si el usuario ya existe
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("El correo ya registrado");
+            throw new UserAlReadyExist("Ya existe un usuario activo registrado con el mismo email");
         }
 
-        // Crear el usuario
         User user = User.builder()
                 .name(request.getName())
                 .email(request.getEmail())
@@ -40,72 +41,31 @@ public class UserService {
                 .isActive(true)
                 .build();
 
-        // Crear los teléfonos si existen
         if (request.getPhones() != null) {
-            List<Phone> phones = request.getPhones().stream()
-                    .map(phoneDto -> Phone.builder()
-                            .number(phoneDto.getNumber())
-                            .citycode(phoneDto.getCitycode())
-                            .contrycode(phoneDto.getContrycode())
-                            .user(user)
-                            .build())
-                    .collect(Collectors.toList());
-            user.setPhones(phones);
+            List<Phone> phones = PhoneMapper.toEntityList(request.getPhones(), user);
         }
 
-        // Generar token JWT
         String token = jwtService.generateToken(user.getEmail());
         user.setToken(token);
 
-        // Guardar en la base de datos
         User savedUser = userRepository.save(user);
 
-        // Convertir a DTO de respuesta
-        return convertToUserResponse(savedUser);
+        return convertToSignUpResponse(savedUser);
     }
 
     @Transactional
-    public UserResponse login(LoginRequest request) {
-        // Buscar usuario por email
+    public UserResponseDto login(LoginRequestDto request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("Usuario y/o contraseña inválidos"));
+                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
 
 
-        // Verificar si el usuario está activo
-        if (!user.getIsActive()) {
-            throw new IllegalArgumentException("Usuario inactivo");
-        }
-
-        // Generar nuevo token JWT
         String token = jwtService.generateToken(user.getEmail());
         user.setToken(token);
         user.setLastLogin(LocalDateTime.now());
 
-        // Guardar cambios
         User savedUser = userRepository.save(user);
 
-        // Convertir a DTO de respuesta
         return convertToUserResponse(savedUser);
     }
 
-    private UserResponse convertToUserResponse(User user) {
-        List<PhoneDto> phoneDtos = user.getPhones().stream()
-                .map(phone -> PhoneDto.builder()
-                        .number(phone.getNumber())
-                        .citycode(phone.getCitycode())
-                        .contrycode(phone.getContrycode())
-                        .build())
-                .collect(Collectors.toList());
-
-        return UserResponse.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .email(user.getEmail())
-                .phones(phoneDtos)
-                .created(user.getCreated())
-                .lastLogin(user.getLastLogin())
-                .token(user.getToken())
-                .isActive(user.getIsActive())
-                .build();
-    }
 } 
