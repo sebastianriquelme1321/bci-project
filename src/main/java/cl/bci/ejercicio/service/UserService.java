@@ -43,6 +43,7 @@ public class UserService {
 
         if (request.getPhones() != null) {
             List<Phone> phones = PhoneMapper.toEntityList(request.getPhones(), user);
+            user.setPhones(phones);
         }
 
         String token = jwtService.generateToken(user.getEmail());
@@ -54,18 +55,15 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponseDto login(LoginRequestDto request) {
-        User user = userRepository.findByEmail(request.getEmail())
+    public UserResponseDto login(String token) {
+        String email = jwtService.extractEmail(token);
+
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
 
-
-        String token = jwtService.generateToken(user.getEmail());
-        user.setToken(token);
         user.setLastLogin(LocalDateTime.now());
-
-        User savedUser = userRepository.save(user);
-
-        return convertToUserResponse(savedUser);
+        userRepository.save(user);
+        return convertToUserResponse(user);
     }
 
 } 

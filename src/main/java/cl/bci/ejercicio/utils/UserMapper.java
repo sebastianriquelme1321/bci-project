@@ -1,7 +1,6 @@
 package cl.bci.ejercicio.utils;
 
 import cl.bci.ejercicio.dto.PhoneDto;
-import cl.bci.ejercicio.dto.SignUpRequestDto;
 import cl.bci.ejercicio.dto.SignUpResponseDto;
 import cl.bci.ejercicio.dto.UserResponseDto;
 import cl.bci.ejercicio.entity.User;
@@ -30,6 +29,7 @@ public class UserMapper {
                 .created(user.getCreated())
                 .lastLogin(user.getLastLogin())
                 .token(user.getToken())
+                .password(user.getPassword())
                 .isActive(user.getIsActive())
                 .build();
     }

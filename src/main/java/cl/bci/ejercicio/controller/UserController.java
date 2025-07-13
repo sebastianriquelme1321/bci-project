@@ -8,10 +8,7 @@ import cl.bci.ejercicio.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -29,8 +26,8 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserResponseDto> login(@Valid @RequestBody LoginRequestDto request) {
-        UserResponseDto response = userService.login(request);
+    public ResponseEntity<UserResponseDto> login(@Valid @RequestHeader String token) {
+        UserResponseDto response = userService.login(token);
         return ResponseEntity.ok(response);
     }
 } 
