@@ -5,7 +5,6 @@ import cl.bci.ejercicio.entity.Phone;
 import cl.bci.ejercicio.entity.User;
 import cl.bci.ejercicio.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +17,6 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final ValidationService validationService;
 
@@ -37,7 +35,7 @@ public class UserService {
         User user = User.builder()
                 .name(request.getName())
                 .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
+                .password(request.getPassword())
                 .isActive(true)
                 .build();
 
@@ -71,10 +69,6 @@ public class UserService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("Usuario y/o contraseña inválidos"));
 
-        // Verificar contraseña
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("Usuario y/o contraseña inválidos");
-        }
 
         // Verificar si el usuario está activo
         if (!user.getIsActive()) {

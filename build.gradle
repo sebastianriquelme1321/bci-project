@@ -1,16 +1,17 @@
 plugins {
-    id 'org.springframework.boot' version '2.5.14'
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
+    id 'groovy'
+    id 'org.springframework.boot' version '2.5.14'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'jacoco'
 }
 
-group = 'cl.bci'
+group = 'com.exercice'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
 
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(11)
     }
 }
 
@@ -19,27 +20,63 @@ repositories {
 }
 
 dependencies {
+    // Spring Boot core
+    implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    
-    // JWT dependencies
-    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-    implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
-    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
-    
-    compileOnly 'org.projectlombok:lombok'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    
+
+    // JWT support
+    implementation 'io.jsonwebtoken:jjwt:0.9.1'
+
+    // H2
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     runtimeOnly 'com.h2database:h2'
-    
-    annotationProcessor 'org.projectlombok:lombok'
-    
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
+
+    // Jakarta Validation API
+    implementation 'jakarta.validation:jakarta.validation-api'
+    implementation 'org.hibernate.validator:hibernate-validator'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    testCompileOnly 'org.projectlombok:lombok:1.18.30'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
+
+
+    // Spring Boot test support (excluding JUnit 4)
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-tasks.named('test') {
+test {
     useJUnitPlatform()
-} 
+
+    sourceSets {
+        test {
+            groovy {
+                srcDirs = ['src/test/groovy']
+            }
+        }
+    }
+
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
+
+    afterEvaluate {
+        classDirectories.setFrom(
+                files(classDirectories.files.collect {
+                    fileTree(dir: it, exclude: [
+                            '**/com/exercice/cdi/exception/**, **/com/exercice/cdi/controller/dto/**, **/com/exercice/cdi/repository/entity/**'
+                    ])
+                })
+        )
+    }
+}
