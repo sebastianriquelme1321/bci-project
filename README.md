@@ -72,7 +72,6 @@ token: <jwt-token>
 
 ### Swagger/OpenAPI
 - **Interfaz interactiva:** http://localhost:8080/swagger-ui/
-- **API Docs JSON:** http://localhost:8080/v2/api-docs
 - **Documentación completa:** `SWAGGER_DOCUMENTATION.md`
 
 ### Diagramas UML
